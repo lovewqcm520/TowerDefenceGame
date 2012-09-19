@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>TowerDefenceGame</name>
+	<comment></comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>com.adobe.flexbuilder.project.flexbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>com.adobe.flexbuilder.project.apollobuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>com.adobe.flexide.project.multiplatform.multiplatformasnature</nature>
+		<nature>com.adobe.flexide.project.multiplatform.multiplatformnature</nature>
+		<nature>com.adobe.flexbuilder.project.apollonature</nature>
+		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>[source path] GdLib-src</name>
+			<type>2</type>
+			<location>D:/jack&apos;s data/Github/GdLib/src</location>
+		</link>
+		<link>
+			<name>[source path] Gestouch-src</name>
+			<type>2</type>
+			<location>D:/jack&apos;s data/Github/Gestouch/src</location>
+		</link>
+		<link>
+			<name>[source path] as3-signals-src</name>
+			<type>2</type>
+			<location>D:/jack&apos;s data/Github/as3-signals/src</location>
+		</link>
+		<link>
+			<name>[source path] source</name>
+			<type>2</type>
+			<location>D:/jack&apos;s data/Github/foxhole-starling/source</location>
+		</link>
+		<link>
+			<name>[source path] starling-src</name>
+			<type>2</type>
+			<location>D:/jack&apos;s data/Github/Starling-Framework/starling/src</location>
+		</link>
+	</linkedResources>
+</projectDescription>
