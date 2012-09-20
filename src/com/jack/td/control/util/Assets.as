@@ -7,7 +7,7 @@ package com.jack.td.control.util
 	import flash.utils.Dictionary;
 	
 	import starling.display.Image;
-	import starling.display.MovieClip;
+	import starling.extensions.MyMovieClip;
 	import starling.textures.Texture;
 	import starling.textures.TextureAtlas;	
 
@@ -23,6 +23,12 @@ package com.jack.td.control.util
 		
 		[Embed(source="assets/swf/enemy1.xml", mimeType="application/octet-stream")]
 		private static const enemy1Xml:Class;
+		
+		[Embed(source="assets/swf/tower1.png")]
+		private static const tower1:Class;
+		
+		[Embed(source="assets/swf/tower1.xml", mimeType="application/octet-stream")]
+		private static const tower1Xml:Class;
 
 
 		private static var mTextureDic:Dictionary=new Dictionary();
@@ -36,6 +42,7 @@ package com.jack.td.control.util
 //			registeTextureAtlas("asset3", "asset3Xml");
 //			registeTextureAtlas("items", "itemsXml");
 			registeTextureAtlas("enemy1", "enemy1Xml");
+			registeTextureAtlas("tower1", "tower1Xml");
 		}
 
 		public static function getBitmap(name:String):Bitmap
@@ -43,11 +50,11 @@ package com.jack.td.control.util
 			return new Assets[name] as Bitmap;
 		}
 
-		public static function getMovieClip(prefix:String, fps:Number=12):MovieClip
+		public static function getMovieClip(prefix:String, fps:Number=12):MyMovieClip
 		{
 			var t:Vector.<Texture>=getTextures(prefix);
 			if (t && t.length > 0)
-				return new MovieClip(t, fps);
+				return new MyMovieClip(t, fps);
 
 			return null;
 		}

@@ -1,11 +1,11 @@
 package com.jack.td.view.component
 {
 	import starling.core.Starling;
-	import starling.display.MovieClip;
+	import starling.extensions.MyMovieClip;
 	import starling.events.Event;
 	import starling.textures.Texture;
 
-	public class OnceMovieClip extends MovieClip
+	public class OnceMovieClip extends MyMovieClip
 	{
 		private var autoDispose:Boolean;
 		private var onFinishFunc:Function;

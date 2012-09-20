@@ -1,12 +1,12 @@
 package com.jack.td.view.component
 {
-	import starling.display.MovieClip;
+	import starling.extensions.MyMovieClip;
 	import starling.events.Touch;
 	import starling.events.TouchEvent;
 	import starling.events.TouchPhase;
 	import starling.textures.Texture;
 
-	public class BaseMovieClip extends MovieClip
+	public class BaseMovieClip extends MyMovieClip
 	{
 		private var onClickFunc:Function;
 

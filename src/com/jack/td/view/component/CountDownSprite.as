@@ -14,7 +14,7 @@ package com.jack.td.view.component
 	
 	import starling.core.Starling;
 	import starling.display.Image;
-	import starling.display.MovieClip;
+	import starling.extensions.MyMovieClip;
 	import starling.display.Sprite;
 
 	public class CountDownSprite extends Sprite
@@ -30,7 +30,7 @@ package com.jack.td.view.component
 
 		private var progress:MyProgressBar;
 		private var pTween:GTween;
-		private var mcMovingIcon:MovieClip;
+		private var mcMovingIcon:MyMovieClip;
 		private var regularBgSkin:Image;
 		private var warningBgSkin:Image;
 		private var onFinishFunc:Function;
