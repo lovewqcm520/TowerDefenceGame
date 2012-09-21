@@ -31,6 +31,8 @@ package com.jack.td
 
 		private var oldTime:Number;
 
+		public var battle:Battle;
+
 		public function Game()
 		{
 		}
@@ -82,7 +84,7 @@ package com.jack.td
 			// read setting config from local shared object
 			
 			// testonly
-			var battle:Battle = new Battle();
+			battle = new Battle();
 			container.addChildScaled(battle);
 		}
 

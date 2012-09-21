@@ -1,10 +1,12 @@
 package com.jack.td.view
 {
 	import com.gdlib.util.Delay;
+	import com.gdlib.util.RandomUtil;
 	import com.jack.td.control.EventController;
 	import com.jack.td.control.Global;
 	import com.jack.td.control.gesture.PanGestureController;
 	import com.jack.td.events.BattleEvent;
+	import com.jack.td.view.bullet.Bullet;
 	import com.jack.td.view.component.BaseSprite;
 	import com.jack.td.view.enemy.Enemy;
 	import com.jack.td.view.screen.TiledMap;
@@ -23,11 +25,12 @@ package com.jack.td.view
 		private var tiledMap:TiledMap;
 		private var enemyList:Vector.<Enemy> = new Vector.<Enemy>();
 		private var towerList:Vector.<Tower> = new Vector.<Tower>();
+		public var bulletList:Vector.<Bullet> = new Vector.<Bullet>();
 		
 		private var tmpTime:Number;
 		private var nowTime:Number;
 		private var _spawnEnemyNum:int;
-		private var _TowerNum:int;
+		private var _towerNum:int;
 		private var _playing:Boolean=true;
 		
 		public function Battle()
@@ -56,7 +59,7 @@ package com.jack.td.view
 			panGesture.activate(tiledMap);
 			
 			_spawnEnemyNum = 0;
-			_TowerNum = 0;
+			_towerNum = 0;
 			
 			// 监听事件
 			addEventListener(TouchEvent.TOUCH, onBattleViewClick);
@@ -64,6 +67,8 @@ package com.jack.td.view
 			EventController.e.addEventListener(BattleEvent.ENEMY_DIE, onEnemyDie);
 			EventController.e.addEventListener(BattleEvent.ENEMY_HURT, onEnemyHurt);
 			EventController.e.addEventListener(BattleEvent.ENEMY_REACH_DESTINATION, onEnemyReachDestination);
+			
+			EventController.e.addEventListener(BattleEvent.BULLET_MOVE_OUT, onBulletMoveOutRange);
 		}
 		
 		protected function onBattleViewClick(e:TouchEvent):void
@@ -73,7 +78,7 @@ package com.jack.td.view
 			if (touch && touch.phase == TouchPhase.ENDED)
 			{
 				// 增加炮塔
-				//addAnTower(1, new Point(touch.globalX/Global.contentScaleXFactor, touch.globalY/Global.contentScaleYFactor));
+				addAnTower(1, new Point(touch.globalX/Global.contentScaleXFactor, touch.globalY/Global.contentScaleYFactor), 36);
 			}
 		}
 		
@@ -85,22 +90,67 @@ package com.jack.td.view
 //				resume();
 //			else
 //				pause();
-			
-			
 		}
 		
 		private function onEnterFrame(e:Event):void
 		{
 			nowTime = getTimer();
-			if(nowTime - tmpTime >= 250)
+			// 增加敌人
+			if(nowTime - tmpTime >= 3000)
 			{
 				tmpTime = nowTime;
 				addNewEnemy();
 			}
 			
-			for (var i:int = 0; i < enemyList.length; i++) 
+			var i:uint;
+			var j:uint;
+			var k:uint;
+			
+			var enemy:Enemy;
+			// 每一帧移动敌人
+			for (i = 0; i < enemyList.length; i++) 
 			{
-				enemyList[i].move();
+				enemy = enemyList[i];
+				// 更新敌人的位置
+				enemy.move();
+				// 计算敌人和炮塔是否交火
+				for (j = 0; j < towerList.length; j++) 
+				{
+					towerList[j].detect(enemy.x, enemy.y, enemy.type);
+				}
+				// 计算敌人是否和子弹碰撞
+				var bullet:Bullet
+				for (k = 0; k < bulletList.length; k++) 
+				{
+					bullet = bulletList[k];
+					bullet.move();
+					// 如果子弹和敌人有碰撞
+					if(bullet.bounds.intersects(enemy.bounds))
+					//if(enemy.hitTest(new Point(bullet.getBounds(enemy).x, bullet.getBounds(enemy).y)))
+					{
+						var damage:Number = RandomUtil.integer(bullet.minDamage, bullet.maxDamage);
+						enemy.hurt(damage);
+						// 判断敌人是否死亡
+						if(enemy.isDead)
+						{
+							enemy.die();
+						}
+						
+						// 从bulletList中删除这个敌人的记录
+						var len:int = bulletList.length;
+						for (var m:int = 0; m < len; m++) 
+						{
+							if(bulletList[m].bulletIndexInQueue == bullet.bulletIndexInQueue)
+							{
+								bulletList.splice(m, 1);
+								break;
+							}
+						}
+						// 删除子弹
+						bullet.removeFromParent(true);
+						bullet = null;
+					}
+				}
 			}
 		}
 		
@@ -167,13 +217,13 @@ package com.jack.td.view
 		
 		private function addAnTower(enemyId:int, bornPlace:Point, fps:Number=12):void
 		{
-			var tower:Tower = new Tower(enemyId, _TowerNum, fps);
+			var tower:Tower = new Tower(enemyId, _towerNum, fps);
 			tower.x = bornPlace.x;
 			tower.y = bornPlace.y;
 			
 			addChild(tower);
 			towerList.push(tower);
-			_TowerNum++;
+			_towerNum++;
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,12 +245,27 @@ package com.jack.td.view
 					break;
 				}
 			}
+			
+			// 更新ui显示
 		}
 		
 		// 敌人死亡后的处理
 		private function onEnemyDie(e:BattleEvent):void
 		{
+			var enemyIndexInQueue:int = int(e.data);
 			
+			// 从enemyList中删除这个敌人的记录
+			var len:int = enemyList.length;
+			for (var i:int = 0; i < len; i++) 
+			{
+				if(enemyList[i].enemyIndexInQueue == enemyIndexInQueue)
+				{
+					enemyList.splice(i, 1);
+					break;
+				}
+			}
+			
+			// 更新ui显示
 		}
 		
 		// 敌人受到伤害后的处理
@@ -209,7 +274,23 @@ package com.jack.td.view
 			
 		}
 		
-
+		// 当子弹运行到最大距离时
+		private function onBulletMoveOutRange(e:BattleEvent):void
+		{
+			var bulletIndexInQueue:int = int(e.data);
+			
+			// 从bulletList中删除这个敌人的记录
+			var len:int = bulletList.length;
+			for (var i:int = 0; i < len; i++) 
+			{
+				if(bulletList[i].bulletIndexInQueue == bulletIndexInQueue)
+				{
+					bulletList[i].removeFromParent(true);
+					bulletList.splice(i, 1);
+					break;
+				}
+			}
+		}
 		
 	}
 }

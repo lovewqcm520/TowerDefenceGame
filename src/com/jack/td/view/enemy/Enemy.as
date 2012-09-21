@@ -21,7 +21,7 @@ package com.jack.td.view.enemy
 		private static const ENEMY_PREFIX:String = "enemy_";
 		
 		private var _name:String;
-		private var _id:int;
+		private var _type:int;
 		private var _enemyIndexInQueue:int;
 		private var _curDirection:int;
 		private var _spawnPoint:Point;
@@ -32,6 +32,7 @@ package com.jack.td.view.enemy
 		private var _curLineAllStep:int;
 		private var _speed:Number=5;
 		private var _isPlaying:Boolean;
+		private var _hp:Number;
 		
 		// 添加放置Enemy的容器
 		// 添加受伤效果
@@ -39,9 +40,9 @@ package com.jack.td.view.enemy
 		private var path:MovePath;
 		private var mc:MyMovieClip;
 		
-		public function Enemy(enemyId:int, _enemyIndexInQueue:int, fps:Number=12)
+		public function Enemy(enemyType:int, _enemyIndexInQueue:int, fps:Number=12)
 		{
-			_id = enemyId;
+			_type = enemyType;
 			_fps = fps;
 			this._enemyIndexInQueue = _enemyIndexInQueue;
 			
@@ -49,6 +50,9 @@ package com.jack.td.view.enemy
 			_curLine = 0;
 			_curLineAllStep = int.MAX_VALUE;
 			_isPlaying = true;
+			
+			// testonly
+			hp = 150;
 		}
 		
 		public function resume():void
@@ -76,18 +80,35 @@ package com.jack.td.view.enemy
 			setDirection(d);
 		}
 
-		public function suicide():void
+		public function hurt(damage:Number):void
 		{
+			hp -= damage;
+			
+			playHurtAnimation();
+			
+			trace("hurt", hp);
 		}
 		
 		public function die():void
 		{
 			playDieAnimation();
+			
+			path = null;
+			this.removeFromParent(true);
+			
+			// 派发消息
+			var e:BattleEvent = new BattleEvent(BattleEvent.ENEMY_DIE, false, _enemyIndexInQueue);
+			EventController.e.dispatchEvent(e);
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
 		//  private functions
 		/////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		private function showHpBar():void
+		{
+			
+		}
 		
 		private function playDieAnimation():void
 		{
@@ -231,7 +252,7 @@ package com.jack.td.view.enemy
 			_curDirection = dir;
 			
 			// 格式类似: enemy_1_se_
-			var textureAtlasPrefix:String = ENEMY_PREFIX + String(_id) + "_" + Common.DIRECTIONS[_curDirection] + "_";
+			var textureAtlasPrefix:String = ENEMY_PREFIX + String(_type) + "_" + Common.DIRECTIONS[_curDirection] + "_";
 			var textures:Vector.<Texture> = Assets.getTextures(textureAtlasPrefix);
 			
 			if(mc)
@@ -263,19 +284,31 @@ package com.jack.td.view.enemy
 			var e:BattleEvent = new BattleEvent(BattleEvent.ENEMY_REACH_DESTINATION, false, _enemyIndexInQueue);
 			EventController.e.dispatchEvent(e);
 		}
-		
-		private function hurt():void
-		{
-			playHurtAnimation();
-		}
-		
 
 		public function get enemyIndexInQueue():int
 		{
 			return _enemyIndexInQueue;
 		}
+
+		public function get type():int
+		{
+			return _type;
+		}
+
+		public function get hp():Number
+		{
+			return _hp;
+		}
+
+		public function set hp(value:Number):void
+		{
+			_hp = value;
+		}
 		
-		
+		public function get isDead():Boolean
+		{
+			return _hp <= 0;
+		}
 		
 	}
 }

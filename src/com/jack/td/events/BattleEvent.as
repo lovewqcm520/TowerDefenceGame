@@ -13,6 +13,9 @@ package com.jack.td.events
 		// 当小日本到达终点时分派 （爱国玩家可千万不要让狗日的到达终点）
 		public static const ENEMY_REACH_DESTINATION:String = "enemy_reach_destination";
 		
+		// 当子弹到达最远距离时分派
+		public static const BULLET_MOVE_OUT:String = "bullet_move_out";
+		
 		public function BattleEvent(type:String, bubbles:Boolean=false, data:Object=null)
 		{
 			super(type, bubbles, data);
