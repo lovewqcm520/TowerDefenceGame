@@ -32,7 +32,7 @@ package com.jack.td
 		private var oldTime:Number;
 
 		public var battle:Battle;
-
+ 
 		public function Game()
 		{
 		}
